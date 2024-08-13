@@ -1,4 +1,4 @@
-# Strava to video
+# Strava-to-Video
 
 Convert personal Strava GDPR data dump to a video recapping activities. Requires reveal.js. Thanks Etienne Gavazzi for the reveal.js tutorial!
 
