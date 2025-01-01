@@ -51,10 +51,12 @@ for a in activities:
             continue
     name=a[2]
     desc=a[4]
-    elgain=float(a[20])
     try:
+        elgain=float(a[20])
         horgain=float(a[6])
     except:
+        print("no elgain or horgain")
+        elgain=0
         horgain=0
     print(elgain)
     total_vert+=elgain
@@ -71,11 +73,20 @@ for a in activities:
                 continue
             bgstr=""
             if m[-4:] == ".mp4":
-                bgstr="data-background-video=\"%s\" data-background-video-loop data-background-video-muted data-autoslide=\"5000\" "%(m)
+                import shlex
+                from subprocess import Popen, PIPE
+#args = shlex.split('sudo /usr/bin/atq')
+                cmdlist=shlex.split("ffprobe -v error -select_streams v:0 -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 %s"%(m))
+           
+                prc = Popen(cmdlist, stdout=PIPE, stderr=PIPE)
+                output, stderr = prc.communicate()
+                video_dur=float(output.strip())
+                print("dur",video_dur)
+                bgstr="data-background-video=\"%s\" data-background-video-loop data-background-video data-autoslide=\"%d\" "%(m,int(n.floor(video_dur*1000)))
             else:
                 #                continue
                 #data-background-size=\"contain\"
-                bgstr="data-background-image=\"%s\" data-autoslide=\"1000\""%(m)
+                bgstr="data-background-image=\"%s\" data-autoslide=\"2000\""%(m)
 #            
                 #           
             #
@@ -84,7 +95,7 @@ for a in activities:
             transition=transitions[int(n.floor(n.random.rand(1)*len(transitions))[0])]
             #data-transition=\"zoom\"
             transition="fade"
-            o.write("<section data-transition=\"%s\" data-transition-speed=\"fast\" %s ><div data-id=\"box\" style=\"height: 1080px; width:1920px;\"><h1 style=\"margin-top: 0px\">%s</h1><p>%s</p><p style=\"position: fixed; bottom: 0px; left: 0px\">%s</p><p style=\"position: fixed; bottom: 0px; right: 0px\">Horizontal: %1.1f km Vertical: %1.0f m</br>Total horizontal %1.1f km vertical: %1.2f km</p></div></section>\n"%(transition,bgstr,name,desc,datestr,horgain,elgain,total_hor,total_vert/1e3))
+            o.write("<section data-transition=\"%s\" data-transition-speed=\"fast\" %s ><div data-id=\"box\" style=\"height: 1080px; width:1920px;\"><h1 style=\"margin-top: 0px; text-shadow: -1px 0 1px black, 0 1px 1px black, 1px 0 1px black, 0 -1px 1px black\">%s</h1><p style=\"text-shadow: -1px 0 1px black, 0 1px 1px black, 1px 0 1px black, 0 -1px 1px black\">%s</p><p style=\"position: fixed; bottom: 0px; left: 0px; text-shadow: -1px 0 1px black, 0 1px 1px black, 1px 0 1px black, 0 -1px 1px black\">%s</p><p style=\"position: fixed; bottom: 0px; right: 0px; text-shadow: -1px 0 1px black, 0 1px 1px black, 1px 0 1px black, 0 -1px 1px black\">Hor / vert: %1.1f km / %1.0f m Season total: %1.1f km / %1.2f km</p></div></section>\n"%(transition,bgstr,name,desc,datestr,horgain,elgain,total_hor,total_vert/1e3))
 
 footer="""
             </div>
